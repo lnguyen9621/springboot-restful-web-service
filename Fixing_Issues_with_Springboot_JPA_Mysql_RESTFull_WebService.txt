@@ -66,3 +66,24 @@ fixed it by changing to reference-type like Integer, Double, Float
 
 line 22: private Integer IndepYear;
 
+
+Notes:
+A null value cannot be assigned to a primitive type, like int, long, boolean, etc. If the database column that corresponds to the field in your object can be null, then your field should be a wrapper class, like Integer, Long, Boolean, etc.
+
+The danger is that your code will run fine if there are no nulls in the DB, but will fail once nulls are inserted.
+
+And you can always return the primitive type from the getter. Ex:
+
+  private Integer num;
+
+  public void setNum(Integer i) {
+    this.num = i;
+  }
+
+  public int getNum() {
+    return this.num;
+  }
+But in most cases you will want to return the wrapper class.
+
+So either set your DB column to not allow nulls, or use a wrapper class.
+
