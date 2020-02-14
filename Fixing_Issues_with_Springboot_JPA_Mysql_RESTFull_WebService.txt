@@ -1,0 +1,68 @@
+-------------------------------------------- ISSUED # 1 With Spring boot JPA SQLSyntaxErrorException ------------------------------------------
+
+http://localhost:3000/country_api
+
+Whitelabel Error Page
+This application has no explicit mapping for /error, so you are seeing this as a fallback.
+
+Thu Feb 13 18:45:31 MST 2020
+There was an unexpected error (type=Internal Server Error, status=500).
+could not extract ResultSet; SQL [n/a]; nested exception is org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+
+
+console logged:
+
+2020-02-13 18:45:31.173  WARN 9300 --- [nio-3000-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1054, SQLState: 42S22
+2020-02-13 18:45:31.174 ERROR 9300 --- [nio-3000-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unknown column 'country0_.government_form' in 'field list'
+2020-02-13 18:45:31.191 ERROR 9300 --- [nio-3000-exec-1] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.dao.InvalidDataAccessResourceUsageException: could not extract ResultSet; SQL [n/a]; nested exception is org.hibernate.exception.SQLGrammarException: could not extract ResultSet] with root cause
+
+java.sql.SQLSyntaxErrorException: Unknown column 'country0_.government_form' in 'field list'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:120) ~[mysql-connector-java-8.0.19.jar:8.0.19]
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:97) ~[mysql-connector-java-8.0.19.jar:8.0.19]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122) ~[mysql-connector-java-8.0.19.jar:8.0.19]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:953) ~[mysql-connector-java-8.0.19.jar:8.0.19]
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeQuery(ClientPreparedStatement.java:1003) ~[mysql-connector-java-8.0.19.jar:8.0.19]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52) ~[HikariCP-3.4.2.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeQuery(HikariProxyPreparedStatement.java) ~[HikariCP-3.4.2.jar:na]
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.extract(ResultSetReturnImpl.java:57) ~[hibernate-core-5.4.10.Final.jar:5.4.10.Final]
+	at org.hibernate.loader.Loader.getResultSet(Loader.java:2292) ~[hibernate-core-5.4.10.Final.jar:5.4.10.Final]
+	
+
+
+FIXED by adding "#spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"
+into src/main/resources/application.property
+
+
+-------------------------------------- ISSUED # 2 With Spring bot JPA mysql java.lang.IllegalArgumentException -----------------------------------------------
+
+http://localhost:3000/country_api
+
+Whitelabel Error Page
+This application has no explicit mapping for /error, so you are seeing this as a fallback.
+
+Thu Feb 13 19:33:32 MST 2020
+There was an unexpected error (type=Internal Server Error, status=500).
+Null value was assigned to a property [class home.javacodes.srpingbootRestWebService.models.Country.IndepYear] of primitive type setter of home.javacodes.srpingbootRestWebService.models.Country.IndepYear; nested exception is org.hibernate.PropertyAccessException: Null value was assigned to a property [class home.javacodes.srpingbootRestWebService.models.Country.IndepYear] of primitive type setter of home.javacodes.srpingbootRestWebService.models.Country.IndepYear
+
+console logge:
+
+2020-02-13 19:33:32.582  INFO 444 --- [nio-3000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2020-02-13 19:33:32.783 ERROR 444 --- [nio-3000-exec-1] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.orm.jpa.JpaSystemException: Null value was assigned to a property [class home.javacodes.srpingbootRestWebService.models.Country.IndepYear] of primitive type setter of home.javacodes.srpingbootRestWebService.models.Country.IndepYear; nested exception is org.hibernate.PropertyAccessException: Null value was assigned to a property [class home.javacodes.srpingbootRestWebService.models.Country.IndepYear] of primitive type setter of home.javacodes.srpingbootRestWebService.models.Country.IndepYear] with root cause
+
+java.lang.IllegalArgumentException: Can not set int field home.javacodes.srpingbootRestWebService.models.Country.IndepYear to null value
+	at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:167) ~[na:1.8.0_221]
+	at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:171) ~[na:1.8.0_221]
+	at sun.reflect.UnsafeIntegerFieldAccessorImpl.set(UnsafeIntegerFieldAccessorImpl.java:80) ~[na:1.8.0_221]
+	at java.lang.reflect.Field.set(Field.java:764) ~[na:1.8.0_221]
+
+
+FIXED by modified src/main/java/home.javacodes.springbootRestWebService/modes/Country.java
+
+field that caused java.lang.IllegalArgumentException in the Country.java is any field that has null value with primitive-type like int, float, double... like
+
+line 22: private int IndepYear;
+
+fixed it by changing to reference-type like Integer, Double, Float
+
+line 22: private Integer IndepYear;
+
